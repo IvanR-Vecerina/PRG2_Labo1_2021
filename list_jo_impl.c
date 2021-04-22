@@ -1,8 +1,9 @@
 //
 //
-#import "stdio.h"
+#include <assert.h>
+#include "stdio.h"
 #include "stdlib.h"
-#import "listes_dynamiques.h"
+#include "listes_dynamiques.h"
 
 // Initialisation de la liste.
 // NB Cette fonction doit obligatoirement être utilisée pour se créer une liste
@@ -203,11 +204,13 @@ void vider(Liste *liste, size_t position) {
         return;
     size_t i = 0;
     Element *ptr = liste->tete;
-    while (ptr && i != position) {
+    while (ptr->suivant && i != position) {
         ++i;
         ptr = ptr->suivant;
-    }      
-    int a = 0;
+    }
+    if( i != position) //position is longer than actual size,
+        return;
+    assert(ptr != NULL);//ptr is not null because there is the check estVide(liste) which check that tete is not null. and
     ptr = ptr->precedent;
     while (ptr != liste->queue) {
         Element *e = liste->queue;
