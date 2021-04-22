@@ -63,7 +63,7 @@ void afficher(const Liste *liste, Mode mode) {
     }
     printf("%c\n", ']');
 }
-/*
+
 // Insère un nouvel élément (contenant info) en tête de liste.
 // Renvoie OK si l'insertion s'est déroulée avec succès et MEMOIRE_INSUFFISANTE
 // s'il n'y a pas assez de mémoire pour créer le nouvel élément. 
@@ -162,11 +162,7 @@ Status supprimerEnQueue(Liste *liste, Info *info) {
 // vérifient le critère passé en second paramètre.
 // Exemple: on souhaite supprimer de la liste tous les éléments dont la position est
 // impaire et pour lesquels info est compris dans un certain intervalle de valeurs
-bool crit(size_t position, const Info *info){
-    int min = 1;
-    int max = 3;
-    return position%2 && (*info) >=min && (*info) <= max;
-}
+
 void deleteNode(Liste* l,Element *n);
 void supprimerSelonCritere(Liste *liste,
                            bool (*critere)(size_t position, const Info *info)) {
@@ -178,6 +174,7 @@ void supprimerSelonCritere(Liste *liste,
         if(critere(i, &(ex->info))){
             deleteNode(liste,ex);
         }
+        ++i;
     }
     
 }
@@ -209,7 +206,9 @@ void vider(Liste *liste, size_t position) {
     while (ptr && i != position) {
         ++i;
         ptr = ptr->suivant;
-    }        
+    }      
+    int a = 0;
+    ptr = ptr->precedent;
     while (ptr != liste->queue) {
         Element *e = liste->queue;
         liste->queue = liste->queue->precedent;
@@ -217,7 +216,8 @@ void vider(Liste *liste, size_t position) {
     }
     if (position == 0)
         liste->tete = NULL;
-    liste->queue->suivant = NULL;
+    if(liste->queue)
+        liste->queue->suivant = NULL;
 }
 
 // ------------------------------------------------------------------------------
@@ -226,7 +226,24 @@ void vider(Liste *liste, size_t position) {
 // Renvoie true si liste1 et liste2 sont égales (au sens mêmes infos et infos
 // apparaissant dans le même ordre), false sinon.
 // NB 2 listes vides sont considérées comme égales.
-bool sontEgales(const Liste *liste1, const Liste *liste2);
+bool sontEgales(const Liste *liste1, const Liste *liste2){
+    if(liste1->tete == liste2->tete && liste1->queue == liste2->queue)
+        return true;
+    Element *e1 = liste1->tete;
+    Element *e2 = liste2->tete;
+    
+    while( e1 && e2){
+        if(e1->info != e2->info)
+            return false;
+        
+        if (( (uintptr_t)e1->suivant>0) ^ ((uintptr_t)e2->suivant > 0)){ // if only one of the pointer is null 
+            return false;
+        } 
+        e1 = e1->suivant;
+        e2 = e2->suivant;
+    }
+    return true;
+}
 // ------------------------------------------------------------------------------
-*/
+
 
