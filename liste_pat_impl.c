@@ -8,9 +8,10 @@
 Status insererEnTete(Liste* liste, const Info* info){
     Element* newElement = calloc(1,sizeof(Element));
     if(newElement == NULL) return MEMOIRE_INSUFFISANTE;
-    newElement->info      = info;
+    newElement->info      = *info;
     newElement->suivant   = liste->tete;
     newElement->precedent = NULL;
+    if(estVide(liste)) liste->queue = newElement;
     liste->tete           = newElement;
 
     return OK;
@@ -24,9 +25,10 @@ Status insererEnTete(Liste* liste, const Info* info){
 Status insererEnQueue(Liste* liste, const Info* info) {
     Element* newElement = calloc(1,sizeof(Element));
     if(newElement == NULL) return MEMOIRE_INSUFFISANTE;
-    newElement->info      = info;
+    newElement->info      = *info;
     newElement->suivant   = NULL;
     newElement->precedent = liste->queue;
+    if(estVide(liste)) liste->tete = newElement;
     liste->queue           = newElement;
 
     return OK;
