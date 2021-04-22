@@ -41,8 +41,10 @@ Status supprimerEnTete(Liste* liste, Info* info) {
     if(estVide(liste)) return LISTE_VIDE;
     Element* newHead = liste->tete->suivant;
     free(liste->tete);
-    newHead->precedent = NULL;
-    liste->tete = newHead;
+    if(newHead != NULL) {
+        newHead->precedent = NULL;
+        liste->tete = newHead;
+    }
     return OK;
 }
 // ------------------------------------------------------------------------------
@@ -55,8 +57,10 @@ Status supprimerEnQueue(Liste* liste, Info* info) {
     if(estVide(liste)) return LISTE_VIDE;
     Element* newTail = liste->queue->precedent;
     free(liste->queue);
-    newTail->suivant = NULL;
-    liste->tete = newTail;
+    if(newTail != NULL) {
+        newTail->suivant = NULL;
+        liste->tete = newTail;
+    }
     return OK;
 }
 // ------------------------------------------------------------------------------
