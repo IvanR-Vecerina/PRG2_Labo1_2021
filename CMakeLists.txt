@@ -3,5 +3,4 @@ project(PRG2_Labo1_2021 C)
 
 set(CMAKE_C_STANDARD 11)
 
-add_executable(PRG2_Labo1_2021 main.c list_jo_impl.c)
-add_executable(PRG2_Labo1_2021_test test_main.c list_jo_impl.c)
+add_executable(PRG2_Labo1_2021 main.c)
