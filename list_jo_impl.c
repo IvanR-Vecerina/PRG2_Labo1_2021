@@ -237,12 +237,13 @@ bool sontEgales(const Liste *liste1, const Liste *liste2){
         return true;
     Element *e1 = liste1->tete;
     Element *e2 = liste2->tete;
-    
+    if( !e1 != !e2)//if one list is empty and not the other
+        return false;
     while( e1 && e2){
         if(e1->info != e2->info)
             return false;
         
-        if (( (uintptr_t)e1->suivant>0) ^ ((uintptr_t)e2->suivant > 0)){ // if ONLY one of the pointer is null 
+        if ( !e1->suivant != !e2->suivant){ // if ONLY one of the pointer is null 
             return false;
         } 
         e1 = e1->suivant;
