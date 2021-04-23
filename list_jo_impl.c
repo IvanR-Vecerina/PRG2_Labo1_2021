@@ -199,30 +199,20 @@ void deleteNode(Liste* l,Element *n){
 // à partir de la position position
 // NB Vider à partir de la position 0 signifie vider toute la liste.
 void vider(Liste *liste, size_t position) {
-    
     //En Θ(N)
     if (estVide(liste))
         return;
     size_t i = 0;
     Element *ptr = liste->tete;
     while(ptr){
-        if(i == position-1) {//update queue to the correct position
-            liste->queue = ptr;
-        }
-        if(i >= position){//we delet the current ptr and continue to the next
-            Element* e = ptr->suivant;
-            free(ptr);
-            ptr = e;
+        if(i >= position){//we delete the current ptr and continue to the next
+            Element* e = ptr;
+            ptr = ptr->suivant;
+            deleteNode(liste,e);
         }else
             ptr = ptr->suivant;
         ++i;
     }
-    if(position == 0) {
-        liste->tete = NULL;
-        liste->queue = NULL;
-    }
-    if(liste->queue) //ensure that the new queue has a null suivant
-        liste->queue->suivant = NULL;
 }
 
 // ------------------------------------------------------------------------------
