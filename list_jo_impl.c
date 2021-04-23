@@ -42,26 +42,19 @@ size_t longueur(const Liste *liste) {
 // En mode FORWARD, resp. BACKWARD, l'affichage se fait en parcourant liste
 // dans le sens tete -> queue, resp. queue -> tete.
 void afficher(const Liste *liste, Mode mode) {
-    printf("%c", '[');
-    Element *e = NULL;
-    if (mode == FORWARD) {
-        e = liste->tete;
-        while (e) {
-            printf("%d", e->info);
-            e = e->suivant;
-            if (e)
-                printf(", ");
-        }
-    } else {
-        e = liste->queue;
-        while (e) {
-            printf("%d", e->info);
-            e = e->precedent;
-            if (e)
-                printf(", ");
-        }
+    if(estVide(liste)){
+        printf("[]\n");
+        return;
     }
-    printf("%c\n", ']');
+    printf("[");
+    Element *e = mode==FORWARD?     //take the next element depending on the mode
+            liste->tete:liste->queue;
+    while(e){
+        printf("%d, ",e->info);
+        e = mode == FORWARD? 
+                e->suivant:e->precedent;
+    }
+    printf("\b\b]\n");//delete the last ,<space> chars
 }
 
 // Insère un nouvel élément (contenant info) en tête de liste.
@@ -123,13 +116,16 @@ Status supprimerEnTete(Liste *liste, Info *info) {
     if (estVide(liste)) {
         return LISTE_VIDE;
     }
+    
     Element *e = liste->tete;
     *info = e->info;
+    
     if (!(e->suivant)) {//there is only one element
         liste->tete = liste->queue = NULL;
         free(e);
         return OK;
     }
+    
     e->suivant->precedent = NULL;
     liste->tete = liste->tete->suivant;
     free(e);
@@ -145,13 +141,16 @@ Status supprimerEnQueue(Liste *liste, Info *info) {
     if (estVide(liste)) {
         return LISTE_VIDE;
     }
+    
     Element *e = liste->queue;
     *info = e->info;
+    
     if (!(e->precedent)) {//there is only one element
         liste->tete = liste->queue = NULL;
         free(e);
         return OK;
     }
+    
     e->precedent->suivant = NULL; //last ptr doesn't have a next node
     liste->queue = liste->queue->precedent;
     free(e);
