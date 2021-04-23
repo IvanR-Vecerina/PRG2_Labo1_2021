@@ -17,8 +17,7 @@ Liste *initialiser() {
 // ------------------------------------------------------------------------------
 // Renvoie true si liste est vide, false sinon.
 bool estVide(const Liste *liste) {
-    return !(liste->tete) || !(liste->queue); //or or and, because if empty
-
+    return !(liste->tete) || !(liste->queue); //if only one the pointer is null, it means we have an ill formed list
 }
 // ------------------------------------------------------------------------------
 
@@ -128,6 +127,7 @@ Status supprimerEnTete(Liste *liste, Info *info) {
     *info = e->info;
     if (!(e->suivant)) {//there is only one element
         liste->tete = liste->queue = NULL;
+        free(e);
         return OK;
     }
     e->suivant->precedent = NULL;
@@ -149,6 +149,7 @@ Status supprimerEnQueue(Liste *liste, Info *info) {
     *info = e->info;
     if (!(e->precedent)) {//there is only one element
         liste->tete = liste->queue = NULL;
+        free(e);
         return OK;
     }
     e->precedent->suivant = NULL; //last ptr doesn't have a next node
@@ -179,7 +180,7 @@ void supprimerSelonCritere(Liste *liste,
     }
     
 }
-//4 cas a considerer : en tete, en queue, au milieu, au milieu mais seul 
+//4 case to considerer : n= first, n = last, n = somehere in the chain, and only one element
 void deleteNode(Liste* l,Element *n){
     if (n == l->tete) 
         l->tete = n->suivant;
@@ -199,27 +200,29 @@ void deleteNode(Liste* l,Element *n){
 // à partir de la position position
 // NB Vider à partir de la position 0 signifie vider toute la liste.
 void vider(Liste *liste, size_t position) {
-    //max en O(N)
+    
+    //En Θ(N)
     if (estVide(liste))
         return;
     size_t i = 0;
     Element *ptr = liste->tete;
-    while (ptr->suivant && i != position) {
+    while(ptr){
+        if(i == position-1) {//update queue to the correct position
+            liste->queue = ptr;
+        }
+        if(i >= position){//we delet the current ptr and continue to the next
+            Element* e = ptr->suivant;
+            free(ptr);
+            ptr = e;
+        }else
+            ptr = ptr->suivant;
         ++i;
-        ptr = ptr->suivant;
     }
-    if( i != position) //position is longer than actual size,
-        return;
-    assert(ptr != NULL);//ptr is not null because there is the check estVide(liste) which check that tete is not null. and
-    ptr = ptr->precedent;
-    while (ptr != liste->queue) {
-        Element *e = liste->queue;
-        liste->queue = liste->queue->precedent;
-        free(e);
-    }
-    if (position == 0)
+    if(position == 0) {
         liste->tete = NULL;
-    if(liste->queue)
+        liste->queue = NULL;
+    }
+    if(liste->queue) //ensure that the new queue has a null suivant
         liste->queue->suivant = NULL;
 }
 
@@ -230,7 +233,7 @@ void vider(Liste *liste, size_t position) {
 // apparaissant dans le même ordre), false sinon.
 // NB 2 listes vides sont considérées comme égales.
 bool sontEgales(const Liste *liste1, const Liste *liste2){
-    if(liste1->tete == liste2->tete && liste1->queue == liste2->queue)
+    if(liste1->tete == liste2->tete && liste1->queue == liste2->queue) //handle ptr to the same list and empty list
         return true;
     Element *e1 = liste1->tete;
     Element *e2 = liste2->tete;
@@ -239,7 +242,7 @@ bool sontEgales(const Liste *liste1, const Liste *liste2){
         if(e1->info != e2->info)
             return false;
         
-        if (( (uintptr_t)e1->suivant>0) ^ ((uintptr_t)e2->suivant > 0)){ // if only one of the pointer is null 
+        if (( (uintptr_t)e1->suivant>0) ^ ((uintptr_t)e2->suivant > 0)){ // if ONLY one of the pointer is null 
             return false;
         } 
         e1 = e1->suivant;

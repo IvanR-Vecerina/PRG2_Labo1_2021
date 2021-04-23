@@ -2,6 +2,8 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <assert.h>
+#include <unistd.h>
 
 bool crit(size_t position, const Info *info){
     int min = 1;
@@ -13,6 +15,7 @@ void generate(Liste* l, size_t n){
         insererEnTete(l,(Info*)&n);
 }
 int main(){
+    //sleep(10); //to attach pid
     Liste * l = initialiser();
     afficher(l,FORWARD);
     int a = 10;
@@ -25,7 +28,7 @@ int main(){
         
         //afficher(l,FORWARD);
     }
-    n = 10;
+    n = 15;//call to suprimerEnTete more time than there is element
     while(n--) {
         afficher(l,FORWARD);
         supprimerEnTete(l, &a);
@@ -44,10 +47,6 @@ int main(){
     printf("%s\n",estVide(l)?"true":"false");
     printf("%zu\n",longueur(l));
 
-//    free(e1);
-//    e1=NULL;
-//    free(e);
-//    e=NULL;
     free(l);
     l=NULL;
     n = 10;
@@ -73,6 +72,22 @@ int main(){
     printf("\n\n");
     afficher(l,FORWARD);
     afficher(ll,FORWARD);
-    printf("%s",sontEgales(l,ll)?"true":"false");
+    printf("%s\n",sontEgales(l,ll)?"true":"false");
+
+    vider(l,0);
+    afficher(l,FORWARD);
+    generate(l,10);
+    afficher(l,FORWARD);
+    printf("----------------------------------------------------------------------\n");
+    n = 10;
     
+    while(n--) {
+        afficher(l, FORWARD);
+        vider(l, n);
+    }
+    afficher(l,FORWARD);
+    vider(l,0);
+    free(e);
+    free(e1);
+    free(l);
 }
