@@ -218,12 +218,11 @@ void vider(Liste *liste, size_t position) {
 // apparaissant dans le même ordre), false sinon.
 // NB 2 listes vides sont considérées comme égales.
 bool sontEgales(const Liste *liste1, const Liste *liste2) {
-    if (liste1->tete == liste2->tete && liste1->queue == liste2->queue) //handle ptr to the same list and empty list
+    if (liste1->tete == liste2->tete && liste1->queue == liste2->queue) //handle ptr to the same list and 2 empty list
         return true;
     Element *e1 = liste1->tete;
     Element *e2 = liste2->tete;
-    if (!e1 != !e2)//if one list is empty and not the other
-        return false;
+    
     while (e1 && e2) {
         if (e1->info != e2->info)
             return false;
@@ -234,7 +233,7 @@ bool sontEgales(const Liste *liste1, const Liste *liste2) {
         e1 = e1->suivant;
         e2 = e2->suivant;
     }
-    return true;
+    return !e1 == !e2;//handle the case were liste1 or liste2 is empty but not the other (and we didn't enter in the while)
 }
 // ------------------------------------------------------------------------------
 
