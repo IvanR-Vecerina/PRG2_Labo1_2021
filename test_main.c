@@ -15,7 +15,7 @@ void generate(Liste* l, size_t n){
         insererEnTete(l,(Info*)&n);
 }
 int main(){
-    //sleep(10); //to attach pid
+    sleep(10); //to attach pid
     Liste * l = initialiser();
     afficher(l,FORWARD);
     int a = 10;
@@ -48,9 +48,8 @@ int main(){
     printf("%zu\n",longueur(l));
 
     free(l);
-    l=NULL;
-    n = 10;
     l = initialiser();
+    n = 10;
     while( n--){
         insererEnQueue(l, (const Info *) &n);
     }
@@ -78,6 +77,7 @@ int main(){
     afficher(l,FORWARD);
     generate(l,10);
     afficher(l,FORWARD);
+     vider(ll,0);
     printf("----------------------------------------------------------------------\n");
     n = 10;
     
@@ -87,7 +87,17 @@ int main(){
     }
     afficher(l,FORWARD);
     vider(l,0);
+    vider(ll,0);
+    generate(l,10);
+    generate(ll,10);
+    vider(ll,0);
+    printf("%s",sontEgales(ll,l)?"true":"false");
+    vider(l,0);
     free(e);
     free(e1);
     free(l);
+    free(ll);
+    
+    
+    sleep(10);
 }

@@ -25,8 +25,6 @@ bool estVide(const Liste *liste) {
 // Renvoie combien il y a d'éléments dans liste.
 size_t longueur(const Liste *liste) {
     Element *ptr = liste->tete;
-    if (!ptr)
-        return 0;
     size_t i = 0;
     while (ptr) {
         ptr = ptr->suivant;
@@ -42,17 +40,17 @@ size_t longueur(const Liste *liste) {
 // En mode FORWARD, resp. BACKWARD, l'affichage se fait en parcourant liste
 // dans le sens tete -> queue, resp. queue -> tete.
 void afficher(const Liste *liste, Mode mode) {
-    if(estVide(liste)){
+    if (estVide(liste)) {
         printf("[]\n");
         return;
     }
     printf("[");
-    Element *e = mode==FORWARD?     //take the next element depending on the mode
-            liste->tete:liste->queue;
-    while(e){
-        printf("%d, ",e->info);
-        e = mode == FORWARD? 
-                e->suivant:e->precedent;
+    Element *e = mode == FORWARD ?     //take the next element depending on the mode
+                 liste->tete : liste->queue;
+    while (e) {
+        printf("%d, ", e->info);
+        e = mode == FORWARD ?
+            e->suivant : e->precedent;
     }
     printf("\b\b]\n");//delete the last ,<space> chars
 }
@@ -116,16 +114,16 @@ Status supprimerEnTete(Liste *liste, Info *info) {
     if (estVide(liste)) {
         return LISTE_VIDE;
     }
-    
+
     Element *e = liste->tete;
     *info = e->info;
-    
+
     if (!(e->suivant)) {//there is only one element
         liste->tete = liste->queue = NULL;
         free(e);
         return OK;
     }
-    
+
     e->suivant->precedent = NULL;
     liste->tete = liste->tete->suivant;
     free(e);
@@ -141,16 +139,16 @@ Status supprimerEnQueue(Liste *liste, Info *info) {
     if (estVide(liste)) {
         return LISTE_VIDE;
     }
-    
+
     Element *e = liste->queue;
     *info = e->info;
-    
+
     if (!(e->precedent)) {//there is only one element
         liste->tete = liste->queue = NULL;
         free(e);
         return OK;
     }
-    
+
     e->precedent->suivant = NULL; //last ptr doesn't have a next node
     liste->queue = liste->queue->precedent;
     free(e);
@@ -164,33 +162,33 @@ Status supprimerEnQueue(Liste *liste, Info *info) {
 // Exemple: on souhaite supprimer de la liste tous les éléments dont la position est
 // impaire et pour lesquels info est compris dans un certain intervalle de valeurs
 
-void deleteNode(Liste* l,Element *n);
+void deleteNode(Liste *l, Element *n);
+
 void supprimerSelonCritere(Liste *liste,
                            bool (*critere)(size_t position, const Info *info)) {
     size_t i = 0;
     Element *ptr = liste->tete;
-    while(ptr){
-        Element *ex = ptr; 
+    while (ptr) {
+        Element *ex = ptr;
         ptr = ptr->suivant;
-        if(critere(i, &(ex->info))){
-            deleteNode(liste,ex);
+        if (critere(i, &(ex->info))) {
+            deleteNode(liste, ex);
         }
         ++i;
     }
-    
 }
+
 //4 case to considerer : n= first, n = last, n = somehere in the chain, and only one element
-void deleteNode(Liste* l,Element *n){
-    if (n == l->tete) 
+void deleteNode(Liste *l, Element *n) {
+    if (n == l->tete)
         l->tete = n->suivant;
-    if (n == l->queue) 
+    if (n == l->queue)
         l->queue = n->precedent;
     if (n->suivant)
         n->suivant->precedent = n->precedent;
     if (n->precedent)
         n->precedent->suivant = n->suivant;
     free(n);
-    
 }
 // ------------------------------------------------------------------------------
 
@@ -199,17 +197,15 @@ void deleteNode(Liste* l,Element *n){
 // à partir de la position position
 // NB Vider à partir de la position 0 signifie vider toute la liste.
 void vider(Liste *liste, size_t position) {
-    //En Θ(N)
-    if (estVide(liste))
-        return;
+    //Θ(N)
     size_t i = 0;
     Element *ptr = liste->tete;
-    while(ptr){
-        if(i >= position){//we delete the current ptr and continue to the next
-            Element* e = ptr;
+    while (ptr) {
+        if (i >= position) {//we delete the current ptr and continue to the next
+            Element *e = ptr;
             ptr = ptr->suivant;
-            deleteNode(liste,e);
-        }else
+            deleteNode(liste, e);
+        } else
             ptr = ptr->suivant;
         ++i;
     }
@@ -221,20 +217,20 @@ void vider(Liste *liste, size_t position) {
 // Renvoie true si liste1 et liste2 sont égales (au sens mêmes infos et infos
 // apparaissant dans le même ordre), false sinon.
 // NB 2 listes vides sont considérées comme égales.
-bool sontEgales(const Liste *liste1, const Liste *liste2){
-    if(liste1->tete == liste2->tete && liste1->queue == liste2->queue) //handle ptr to the same list and empty list
+bool sontEgales(const Liste *liste1, const Liste *liste2) {
+    if (liste1->tete == liste2->tete && liste1->queue == liste2->queue) //handle ptr to the same list and empty list
         return true;
     Element *e1 = liste1->tete;
     Element *e2 = liste2->tete;
-    if( !e1 != !e2)//if one list is empty and not the other
+    if (!e1 != !e2)//if one list is empty and not the other
         return false;
-    while( e1 && e2){
-        if(e1->info != e2->info)
+    while (e1 && e2) {
+        if (e1->info != e2->info)
             return false;
-        
-        if ( !e1->suivant != !e2->suivant){ // if ONLY one of the pointer is null 
+
+        if (!e1->suivant != !e2->suivant) { // if ONLY one of the pointer is null 
             return false;
-        } 
+        }
         e1 = e1->suivant;
         e2 = e2->suivant;
     }
