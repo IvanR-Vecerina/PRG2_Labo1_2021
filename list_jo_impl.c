@@ -1,12 +1,10 @@
 //
 //
-#include <assert.h>
 #include "stdio.h"
 #include "stdlib.h"
 #include "listes_dynamiques.h"
 
-//4 case to considerer : n= first, n = last, n = somehere in the chain, and only one element
-//delete a node from a double linked list
+//4 cas a considerer : n = tete, n = queue, n = un maillon au hasard ou un element seul dans la liste
 void deleteNode(Liste *l, Element *n) {
     if (n == l->tete)
         l->tete = n->suivant;
@@ -32,7 +30,7 @@ Liste *initialiser() {
 // ------------------------------------------------------------------------------
 // Renvoie true si liste est vide, false sinon.
 bool estVide(const Liste *liste) {
-    return !(liste->tete) || !(liste->queue); //if only one the pointer is null, it means we have an ill formed list
+    return !(liste->tete) || !(liste->queue); // Si seulement un des ptr est a NULL, nous avons une liste malformee
 }
 // ------------------------------------------------------------------------------
 
@@ -60,14 +58,14 @@ void afficher(const Liste *liste, Mode mode) {
         return;
     }
     printf("[");
-    Element *e = mode == FORWARD ?     //take the next element depending on the mode
+    Element *e = mode == FORWARD ?     //prend le prochain element en fonction du mode
                  liste->tete : liste->queue;
     while (e) {
         printf("%d, ", e->info);
         e = mode == FORWARD ?
             e->suivant : e->precedent;
     }
-    printf("\b\b]\n");//delete the last ,<space> chars
+    printf("\b\b]\n");//supprime les derniers ,<space> chars
 }
 
 // Insère un nouvel élément (contenant info) en tête de liste.
@@ -78,11 +76,10 @@ Status insererEnTete(Liste *liste, const Info *info) {
     if (!e) {
         return MEMOIRE_INSUFFISANTE;
     }
-    e->info = *info; //deep copy
+    e->info = *info; // copie profonde
 
-    if (estVide(liste)) {
-        liste->tete = e;
-        liste->queue = e;
+    if (estVide(liste)) {       //pas suffisament de code pour extraire dans sa propre fonction
+        liste->tete = liste->queue = e;
         return OK;
     }
 
@@ -103,15 +100,14 @@ Status insererEnQueue(Liste *liste, const Info *info) {
     if (!e) {
         return MEMOIRE_INSUFFISANTE;
     }
-    e->info = *info; //deep copy
+    e->info = *info; 
 
     if (estVide(liste)) {
-        liste->tete = e;
-        liste->queue = e;
+        liste->tete = liste->queue = e;
         return OK;
     }
 
-    Element *ex = liste->queue;
+    Element *ex = liste->queue; //cas courant
     liste->queue = e;
     e->precedent = ex;
     ex->suivant = e;
@@ -130,7 +126,7 @@ Status supprimerEnTete(Liste *liste, Info *info) {
         return LISTE_VIDE;
     }
     *info = liste->tete->info;
-    deleteNode(liste,liste->tete);
+    deleteNode(liste,liste->tete);//supprime l'élément de tete
     return OK;
 }
 // ------------------------------------------------------------------------------
@@ -143,9 +139,8 @@ Status supprimerEnQueue(Liste *liste, Info *info) {
     if (estVide(liste)) {
         return LISTE_VIDE;
     }
-
     *info = liste->tete->info;
-    deleteNode(liste,liste->queue);
+    deleteNode(liste,liste->queue);//supprime l'élément de queue
 
     return OK;
 }
@@ -184,7 +179,7 @@ void vider(Liste *liste, size_t position) {
     size_t i = 0;
     Element *ptr = liste->tete;
     while (ptr) {
-        if (i >= position) {//we delete the current ptr and continue to the next
+        if (i >= position) {//on supprime le ptr courant et on avance au suivant
             Element *e = ptr;
             ptr = ptr->suivant;
             deleteNode(liste, e);
