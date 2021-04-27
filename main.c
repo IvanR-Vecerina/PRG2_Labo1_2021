@@ -71,7 +71,6 @@ int main() {
     }
     n = DIX + 5;//call to suprimerEnTete more time than there is element
     printf("\nsupprimer en tete 15X\n");
-
     while (n--) {
         afficher(l, FORWARD);
         supprimerEnTete(l, &a);
