@@ -5,6 +5,21 @@
 #include "stdlib.h"
 #include "listes_dynamiques.h"
 
+//4 case to considerer : n= first, n = last, n = somehere in the chain, and only one element
+//delete a node from a double linked list
+void deleteNode(Liste *l, Element *n) {
+    if (n == l->tete)
+        l->tete = n->suivant;
+    if (n == l->queue)
+        l->queue = n->precedent;
+    if (n->suivant)
+        n->suivant->precedent = n->precedent;
+    if (n->precedent)
+        n->precedent->suivant = n->suivant;
+    free(n);
+}
+
+
 // Initialisation de la liste.
 // NB Cette fonction doit obligatoirement être utilisée pour se créer une liste
 // car elle garantit la mise à NULL des champs tete et queue de la liste
@@ -114,19 +129,8 @@ Status supprimerEnTete(Liste *liste, Info *info) {
     if (estVide(liste)) {
         return LISTE_VIDE;
     }
-
-    Element *e = liste->tete;
-    *info = e->info;
-
-    if (!(e->suivant)) {//there is only one element
-        liste->tete = liste->queue = NULL;
-        free(e);
-        return OK;
-    }
-
-    e->suivant->precedent = NULL;
-    liste->tete = liste->tete->suivant;
-    free(e);
+    *info = liste->tete->info;
+    deleteNode(liste,liste->tete);
     return OK;
 }
 // ------------------------------------------------------------------------------
@@ -140,18 +144,9 @@ Status supprimerEnQueue(Liste *liste, Info *info) {
         return LISTE_VIDE;
     }
 
-    Element *e = liste->queue;
-    *info = e->info;
+    *info = liste->tete->info;
+    deleteNode(liste,liste->queue);
 
-    if (!(e->precedent)) {//there is only one element
-        liste->tete = liste->queue = NULL;
-        free(e);
-        return OK;
-    }
-
-    e->precedent->suivant = NULL; //last ptr doesn't have a next node
-    liste->queue = liste->queue->precedent;
-    free(e);
     return OK;
 }
 // ------------------------------------------------------------------------------
@@ -162,7 +157,6 @@ Status supprimerEnQueue(Liste *liste, Info *info) {
 // Exemple: on souhaite supprimer de la liste tous les éléments dont la position est
 // impaire et pour lesquels info est compris dans un certain intervalle de valeurs
 
-void deleteNode(Liste *l, Element *n);
 
 void supprimerSelonCritere(Liste *liste,
                            bool (*critere)(size_t position, const Info *info)) {
@@ -178,18 +172,7 @@ void supprimerSelonCritere(Liste *liste,
     }
 }
 
-//4 case to considerer : n= first, n = last, n = somehere in the chain, and only one element
-void deleteNode(Liste *l, Element *n) {
-    if (n == l->tete)
-        l->tete = n->suivant;
-    if (n == l->queue)
-        l->queue = n->precedent;
-    if (n->suivant)
-        n->suivant->precedent = n->precedent;
-    if (n->precedent)
-        n->precedent->suivant = n->suivant;
-    free(n);
-}
+
 // ------------------------------------------------------------------------------
 
 // ------------------------------------------------------------------------------
