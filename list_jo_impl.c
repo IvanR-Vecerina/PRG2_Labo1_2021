@@ -5,16 +5,16 @@
 #include "listes_dynamiques.h"
 
 //4 cas a considerer : n = tete, n = queue, n = un maillon au hasard ou un element seul dans la liste
-void deleteNode(Liste *l, Element *n) {
-    if (n == l->tete)
-        l->tete = n->suivant;
-    if (n == l->queue)
-        l->queue = n->precedent;
-    if (n->suivant)
-        n->suivant->precedent = n->precedent;
-    if (n->precedent)
-        n->precedent->suivant = n->suivant;
-    free(n);
+void supprimerNoeud(Liste *l, Element *e) {
+    if (e == l->tete)
+        l->tete = e->suivant;
+    if (e == l->queue)
+        l->queue = e->precedent;
+    if (e->suivant)
+		 e->suivant->precedent = e->precedent;
+    if (e->precedent)
+		 e->precedent->suivant = e->suivant;
+    free(e);
 }
 
 

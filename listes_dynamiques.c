@@ -7,7 +7,9 @@ Date creation  : 27.04.2021.
 Description    : implementation de la librairie permettant la gestion de listes doublement chaînées
                   non circulaires
 
- Remarque(s)    : -
+ Remarque(s)    : Nous aurions pu implenter insererApresNoeuds et l'utiliser dans nos fonctions
+                  insererEn*, mais avec uniqument deux usages ce n'est pas utile
+                  Nous avons cependant fait supprimerNoeud car il est utilisé 3 fois
 
  Compilateur    : Apple clang version 12.0.0 (clang-1200.0.32.2)/Mingw-w64 gcc 8.1.0
 -----------------------------------------------------------------------------------
@@ -21,10 +23,11 @@ Description    : implementation de la librairie permettant la gestion de listes 
 
 // 4 cas a considerer : n = tete, n = queue, n = un maillon au hasard ou un element seul dans la liste
 // delete node supprime de la liste l l'element n 
-// on condsidere que ni l ni n sont null car tous les appels sont fait depuis cette librarie et 
+// on considere que ni l ni n sont null car tous les appels sont fait depuis cette librarie et 
 // ils verifient tous que la liste n'est pas vide donc l existe et n n'est pas null
 // de plus on considère que l'element n apartient bien a la liste n sans verification prealable
-void deleteNode(Liste *l, Element *e) {
+// ceci afin de rester efficace
+void supprimerNoeud(Liste *l, Element *e) {
 	if (e == l->tete)
 		l->tete = e->suivant;
 	if (e == l->queue)
@@ -77,14 +80,14 @@ void afficher(const Liste *liste, Mode mode) {
 		return;
 	}
 	printf("[");
-	Element *e = mode == FORWARD ?     //prend le prochain element en fonction du mode
+	Element *e = mode == FORWARD ?     // Prend le prochain element en fonction du mode
 					 liste->tete : liste->queue;
 	while (e != NULL) {
 		printf("%d, ", e->info);
 		e = mode == FORWARD ?
 			 e->suivant : e->precedent;
 	}
-	printf("\b\b]\n");//supprime les derniers ,<space> chars
+	printf("\b\b]\n");// supprime les derniers ,<space> chars
 }
 
 // Insère un nouvel élément (contenant info) en tête de liste.
@@ -95,9 +98,9 @@ Status insererEnTete(Liste *liste, const Info *info) {
 	if (e == NULL) {
 		return MEMOIRE_INSUFFISANTE;
 	}
-	e->info = *info; // copie profonde
+	e->info = *info; // Copie profonde
 
-	if (estVide(liste)) {       //pas suffisament de code pour extraire dans sa propre fonction
+	if (estVide(liste)) {       // Pas suffisament de code pour extraire dans sa propre fonction
 		liste->tete = liste->queue = e;
 		return OK;
 	}
@@ -126,7 +129,7 @@ Status insererEnQueue(Liste *liste, const Info *info) {
 		return OK;
 	}
 
-	Element *ex = liste->queue; //cas courant
+	Element *ex = liste->queue; // Cas courant
 	liste->queue = e;
 	e->precedent = ex;
 	ex->suivant = e;
@@ -145,7 +148,7 @@ Status supprimerEnTete(Liste *liste, Info *info) {
 		return LISTE_VIDE;
 	}
 	*info = liste->tete->info;
-	deleteNode(liste, liste->tete);//supprime l'élément de tete
+	supprimerNoeud(liste, liste->tete);// Supprime l'élément de tete
 	return OK;
 }
 // ------------------------------------------------------------------------------
@@ -159,7 +162,7 @@ Status supprimerEnQueue(Liste *liste, Info *info) {
 		return LISTE_VIDE;
 	}
 	*info = liste->queue->info;
-	deleteNode(liste, liste->queue);//supprime l'élément de queue
+	supprimerNoeud(liste, liste->queue);// supprime l'élément de queue
 	return OK;
 }
 // ------------------------------------------------------------------------------
@@ -173,14 +176,14 @@ Status supprimerEnQueue(Liste *liste, Info *info) {
 
 void supprimerSelonCritere(Liste *liste,
 									bool (*critere)(size_t position, const Info *info)) {
-	//le parametre position est utilisée dans la fonction critere a l'interne
+	// Le parametre position est utilisée dans la fonction critere a l'interne
 	size_t i = 0;
 	Element *ptr = liste->tete;
 	while (ptr != NULL) {
 		Element *ex = ptr;
 		ptr = ptr->suivant;
 		if (critere(i, &(ex->info))) {
-			deleteNode(liste, ex);
+			supprimerNoeud(liste, ex);
 		}
 		++i;
 	}
@@ -198,12 +201,12 @@ void vider(Liste *liste, size_t position) {
 	size_t i = 0;
 	Element *ptr = liste->tete;
 	while (ptr != NULL) {
-		if (i >= position) {//on supprime le ptr courant et on avance au suivant
+		if (i >= position) {// On supprime le ptr courant et on avance au suivant
 			Element *e = ptr;
 			ptr = ptr->suivant;
-			deleteNode(liste, e);
+			supprimerNoeud(liste, e);
 		} else
-			ptr = ptr->suivant;//si on ne supprime pas on avance quand meme
+			ptr = ptr->suivant;// Si on ne supprime pas on avance quand meme
 		++i;
 	}
 }
@@ -215,7 +218,7 @@ void vider(Liste *liste, size_t position) {
 // apparaissant dans le même ordre), false sinon.
 // NB 2 listes vides sont considérées comme égales.
 bool sontEgales(const Liste *liste1, const Liste *liste2) {
-	if (liste1->tete == liste2->tete && liste1->queue == liste2->queue) //handle ptr to the same list and 2 empty list
+	if (liste1->tete == liste2->tete && liste1->queue == liste2->queue) // gere le cas avec deux listes vides
 		return true;
 	Element *e1 = liste1->tete;
 	Element *e2 = liste2->tete;
@@ -224,12 +227,12 @@ bool sontEgales(const Liste *liste1, const Liste *liste2) {
 		if (e1->info != e2->info)
 			return false;
 
-		if (!e1->suivant != !e2->suivant) { // if ONLY one of the pointer is null 
+		if (!e1->suivant != !e2->suivant) { // Si uniquement 1 des ptr est NULL
 			return false;
 		}
 		e1 = e1->suivant;
 		e2 = e2->suivant;
 	}
-	return !e1 ==
-			 !e2;//handle the case were liste1 or liste2 is empty but not the other (and we didn't enter in the while)
+	// gere le cas ou une seule liste est vide
+	return !e1 == !e2; 
 }

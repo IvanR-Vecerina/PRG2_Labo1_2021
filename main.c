@@ -19,7 +19,6 @@ Description    : Programme de teste qui utilise l'ensemble des fonctionnalites o
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
-#include <unistd.h>
 
 #define DIX  10
 #define MSG "Impossible d'allouer de la memoire, fermeture..."
@@ -93,7 +92,7 @@ int main() {
 	++a;
 	afficher(l, FORWARD);
 	Info n = DIX;
-	printf("\ninserer en queue\n");
+	printf("\ninserer en queue %dX\n",(int)n);
 	while (n--) {
 		if (insererEnQueue(l, &n) != OK) {
 			NETTOIE(l);
@@ -103,7 +102,7 @@ int main() {
 	}
 	const int cinq = 5;
 	n = DIX + cinq;//appel a  suprimerEnTete plus de fois qu'il n'existe d'elements
-	printf("\nsupprimer en tete %d\n", DIX + cinq);
+	printf("\nsupprimer en tete %dX\n", DIX + cinq);
 	while (n--) {
 		afficher(l, FORWARD);
 		supprimerEnTete(l, &a);
