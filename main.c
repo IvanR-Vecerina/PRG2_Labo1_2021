@@ -112,7 +112,7 @@ int main() {
 	++a;
 	afficher(l, FORWARD);
 	Info n = DIX;
-	printf("\ninserer en queue %dX\n",(int)n);
+	printf("\ninserer en queue %dX\n", (int) n);
 	while (n--) {
 		if (insererEnQueue(l, &n) != OK) {
 			NETTOIE(l);
@@ -121,7 +121,7 @@ int main() {
 		afficher(l, FORWARD);
 	}
 	const int cinq = 5;
-	n = DIX + cinq;	// Appel a  suprimerEnTete plus de fois qu'il n'existe d'elements
+	n = DIX + cinq;   // Appel a  suprimerEnTete plus de fois qu'il n'existe d'elements
 	printf("\nsupprimer en tete %dX\n", DIX + cinq);
 	while (n--) {
 		afficher(l, FORWARD);
@@ -155,7 +155,7 @@ int main() {
 
 	// Affiche les deux noeuds
 	afficher(l, BACKWARD);
-	printf("la liste est vide ? : %s\n", estVide(l) ? V : F);	// Faux car deux noeuds ont été insérer
+	printf("la liste est vide ? : %s\n", estVide(l) ? V : F);   // Faux car deux noeuds ont été insérer
 	printf("la longueur de la liste vaut : %zu\n", longueur(l));// 2
 	assert(longueur(l) == 2);
 	free(e);
@@ -180,7 +180,7 @@ int main() {
 	while (n--) {
 		afficher(l, FORWARD);
 		afficher(l, BACKWARD);
-		supprimerEnQueue(l, &a); 	// Supprime les noeuds inserer
+		supprimerEnQueue(l, &a);   // Supprime les noeuds inserer
 		printf("\nValeur supprimee: %d\n", a);
 	}
 
@@ -263,7 +263,7 @@ int main() {
 	printf("\nVidage incremental de la liste 1\n");
 	while (n--) {
 		afficher(l, FORWARD);
-		assert(longueur(l) == (size_t) (n + 1));	// Longueur est plus grand de 1 que n
+		assert(longueur(l) == (size_t) (n + 1));   // Longueur est plus grand de 1 que n
 		vider(l, (size_t) n);
 		assert(longueur(l) == (size_t) n);
 	}
