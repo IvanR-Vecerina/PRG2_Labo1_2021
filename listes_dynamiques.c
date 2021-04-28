@@ -19,17 +19,21 @@ Description    : implementation de la librairie permettant la gestion de listes 
 #include "stdlib.h"
 #include "listes_dynamiques.h"
 
-//4 cas a considerer : n = tete, n = queue, n = un maillon au hasard ou un element seul dans la liste
-void deleteNode(Liste *l, Element *n) {
-    if (n == l->tete)
-        l->tete = n->suivant;
-    if (n == l->queue)
-        l->queue = n->precedent;
-    if (n->suivant)
-        n->suivant->precedent = n->precedent;
-    if (n->precedent)
-        n->precedent->suivant = n->suivant;
-    free(n);
+// 4 cas a considerer : n = tete, n = queue, n = un maillon au hasard ou un element seul dans la liste
+// delete node supprime de la liste l l'element n 
+// on condsidere que ni l ni n sont null car tous les appels sont fait depuis cette librarie et 
+// ils verifient tous que la liste n'est pas vide donc l existe et n n'est pas null
+// de plus on considère que l'element n apartient bien a la liste n sans verification prealable
+void deleteNode(Liste *l, Element *e) {
+    if (e == l->tete)
+        l->tete = e->suivant;
+    if (e == l->queue)
+        l->queue = e->precedent;
+    if (e->suivant)
+        e->suivant->precedent = e->precedent;
+    if (e->precedent)
+        e->precedent->suivant = e->suivant;
+    free(e);
 }
 
 
@@ -54,7 +58,7 @@ bool estVide(const Liste *liste) {
 size_t longueur(const Liste *liste) {
     Element *ptr = liste->tete;
     size_t i = 0;
-    while (ptr) {
+    while (ptr != NULL) {
         ptr = ptr->suivant;
         ++i;
     }
@@ -75,7 +79,7 @@ void afficher(const Liste *liste, Mode mode) {
     printf("[");
     Element *e = mode == FORWARD ?     //prend le prochain element en fonction du mode
                  liste->tete : liste->queue;
-    while (e) {
+    while (e != NULL) {
         printf("%d, ", e->info);
         e = mode == FORWARD ?
             e->suivant : e->precedent;
@@ -88,7 +92,7 @@ void afficher(const Liste *liste, Mode mode) {
 // s'il n'y a pas assez de mémoire pour créer le nouvel élément. 
 Status insererEnTete(Liste *liste, const Info *info) {
     Element *e = calloc(1, sizeof(Element));
-    if (!e) {
+    if (e == NULL) {
         return MEMOIRE_INSUFFISANTE;
     }
     e->info = *info; // copie profonde
@@ -112,7 +116,7 @@ Status insererEnTete(Liste *liste, const Info *info) {
 // s'il n'y a pas assez de mémoire pour créer le nouvel élément. 
 Status insererEnQueue(Liste *liste, const Info *info) {
     Element *e = calloc(1, sizeof(Element));
-    if (!e) {
+    if (e == NULL) {
         return MEMOIRE_INSUFFISANTE;
     }
     e->info = *info;
@@ -154,9 +158,8 @@ Status supprimerEnQueue(Liste *liste, Info *info) {
     if (estVide(liste)) {
         return LISTE_VIDE;
     }
-    *info = liste->tete->info;
+    *info = liste->queue->info;
     deleteNode(liste,liste->queue);//supprime l'élément de queue
-
     return OK;
 }
 // ------------------------------------------------------------------------------
@@ -173,7 +176,7 @@ void supprimerSelonCritere(Liste *liste,
     //le parametre position est utilisée dans la fonction critere a l'interne
     size_t i = 0;
     Element *ptr = liste->tete;
-    while (ptr) {
+    while (ptr != NULL) {
         Element *ex = ptr;
         ptr = ptr->suivant;
         if (critere(i, &(ex->info))) {
@@ -194,7 +197,7 @@ void vider(Liste *liste, size_t position) {
     //Θ(N)
     size_t i = 0;
     Element *ptr = liste->tete;
-    while (ptr) {
+    while (ptr != NULL) {
         if (i >= position) {//on supprime le ptr courant et on avance au suivant
             Element *e = ptr;
             ptr = ptr->suivant;
@@ -217,7 +220,7 @@ bool sontEgales(const Liste *liste1, const Liste *liste2) {
     Element *e1 = liste1->tete;
     Element *e2 = liste2->tete;
 
-    while (e1 && e2) {
+    while (e1 != NULL && e2 != NULL) {
         if (e1->info != e2->info)
             return false;
 
