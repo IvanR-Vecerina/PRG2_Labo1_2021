@@ -1,18 +1,18 @@
 /*
------------------------------------------------------------------------------------
-Nom du fichier : listes_dynamiques.c
-Nom du labo    : labo 1 : liste doublement chainee
-Auteur(s)      : Patrick Furrer, Joris Schaller, Ivan Vecerina
-Date creation  : 27.04.2021.
-Description    : implementation de la librairie permettant la gestion de listes doublement chaînées
+ -----------------------------------------------------------------------------------
+ Nom du fichier : listes_dynamiques.c
+ Nom du labo    : labo 1 : liste doublement chainee
+ Auteur(s)      : Patrick Furrer, Joris Schaller, Ivan Vecerina
+ Date creation  : 27.04.2021.
+ Description    : implementation de la librairie permettant la gestion de listes doublement chaînées
                   non circulaires
 
  Remarque(s)    : Nous aurions pu implenter insererApresNoeuds et l'utiliser dans nos fonctions
                   insererEn*, mais avec uniqument deux usages ce n'est pas utile
-                  Nous avons cependant fait supprimerNoeud car il est utilisé 3 fois
+                  Nous avons cependant fait supprimerNoeud car elle est utilisée 4 fois
 
  Compilateur    : Apple clang version 12.0.0 (clang-1200.0.32.2)/Mingw-w64 gcc 8.1.0
------------------------------------------------------------------------------------
+ -----------------------------------------------------------------------------------
 */
 
 
@@ -30,12 +30,12 @@ Description    : implementation de la librairie permettant la gestion de listes 
 void supprimerNoeud(Liste *l, Element *e) {
 	if (e == l->tete)
 		l->tete = e->suivant;
+	else
+		e->precedent->suivant = e->suivant;
 	if (e == l->queue)
 		l->queue = e->precedent;
-	if (e->suivant)
+	else
 		e->suivant->precedent = e->precedent;
-	if (e->precedent)
-		e->precedent->suivant = e->suivant;
 	free(e);
 }
 
@@ -75,19 +75,16 @@ size_t longueur(const Liste *liste) {
 // En mode FORWARD, resp. BACKWARD, l'affichage se fait en parcourant liste
 // dans le sens tete -> queue, resp. queue -> tete.
 void afficher(const Liste *liste, Mode mode) {
-	if (estVide(liste)) {
-		printf("[]\n");
-		return;
-	}
+	const bool fwd = (mode == FORWARD);
 	printf("[");
-	Element *e = mode == FORWARD ?     // Prend le prochain element en fonction du mode
-					 liste->tete : liste->queue;
-	while (e != NULL) {
-		printf("%d, ", e->info);
-		e = mode == FORWARD ?
-			 e->suivant : e->precedent;
+	char const *format = "%d";
+	Element *e = fwd ? liste->tete : liste->queue;
+	while (e) {
+		printf(format, e->info);
+		format = ", %d"; // use a comma-space separator for the next items
+		e = fwd ? e->suivant : e->precedent;
 	}
-	printf("\b\b]\n");// supprime les derniers ,<space> chars
+	printf("]\n");
 }
 
 // Insère un nouvel élément (contenant info) en tête de liste.
@@ -99,16 +96,13 @@ Status insererEnTete(Liste *liste, const Info *info) {
 		return MEMOIRE_INSUFFISANTE;
 	}
 	e->info = *info; // Copie profonde
-
-	if (estVide(liste)) {       // Pas suffisament de code pour extraire dans sa propre fonction
-		liste->tete = liste->queue = e;
-		return OK;
-	}
-
-	Element *ex = liste->tete;
+	e->suivant = liste->tete;
+	// e->precedent = NULL;   // Redondant car on utilise calloc
+	if (liste->tete)
+		liste->tete->precedent = e;
+	else
+		liste->queue = e;
 	liste->tete = e;
-	e->suivant = ex;
-	ex->precedent = e;
 	return OK;
 }
 // ------------------------------------------------------------------------------
@@ -123,16 +117,13 @@ Status insererEnQueue(Liste *liste, const Info *info) {
 		return MEMOIRE_INSUFFISANTE;
 	}
 	e->info = *info;
-
-	if (estVide(liste)) {
-		liste->tete = liste->queue = e;
-		return OK;
-	}
-
-	Element *ex = liste->queue; // Cas courant
+	e->precedent = liste->queue;
+	// e->suivant = NULL;   // Idem
+	if (liste->queue)
+		liste->queue->suivant = e;
+	else
+		liste->tete = e;
 	liste->queue = e;
-	e->precedent = ex;
-	ex->suivant = e;
 	return OK;
 }
 
@@ -226,13 +217,10 @@ bool sontEgales(const Liste *liste1, const Liste *liste2) {
 	while (e1 != NULL && e2 != NULL) {
 		if (e1->info != e2->info)
 			return false;
-
-		if (!e1->suivant != !e2->suivant) { // Si uniquement 1 des ptr est NULL
-			return false;
-		}
+		
 		e1 = e1->suivant;
 		e2 = e2->suivant;
 	}
 	// gere le cas ou une seule liste est vide
-	return !e1 == !e2; 
+	return (e1 == e2); 
 }

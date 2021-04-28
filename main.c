@@ -19,6 +19,7 @@ Description    : Programme de teste qui utilise l'ensemble des fonctionnalites o
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
+// #include <unistd.h>
 
 #define DIX  10
 #define MSG "Impossible d'allouer de la memoire, fermeture..."
@@ -46,26 +47,45 @@ void test_insererEtSupprimerEnChangeLongeur();
 void test_vider();
 
 void test_sontEgales();
-
+// ------------------------------------------------------------------------------
+// crit retourn vrai l'information est comprise dans le domaine [MIN;MAX] et que sa
+// position est impair
 bool crit(size_t position, const Info *info) {
 
 	return (position % 2) && (*info) >= MIN && (*info) <= MAX;
 }
+// ------------------------------------------------------------------------------
 
+// ------------------------------------------------------------------------------
+// seconde fonction criter qui retourne toujours vrai, util pour vider une liste 
+// en utilisant supprimerSelonCritere 
 bool criter2(size_t position, const Info *info) {
 	return true;
 }
-//generate retourne true si une erreur est arrive lors de l'execution false sinon
-bool generate(Liste *l, size_t n) {
+// ------------------------------------------------------------------------------
+
+// ------------------------------------------------------------------------------
+// Generer retourne vrai si une erreur est arrive lors de l'execution false sinon
+bool generer(Liste *l, size_t n) {
 	bool flag = false;
 	while (n--)
-		flag |= insererEnTete(l, (Info *) &n) == OK ? false : true;
+		flag = insererEnTete(l, (Info *) &n) == OK ? flag : true;
 	return flag;
 }
+// ------------------------------------------------------------------------------
 
+
+// ------------------------------------------------------------------------------
+// programme conducteur qui controle les listes. On verifie que toutes les 
+// assertions des fonctions de testes sont passees
+// ainsi que le bon deroulement d'un programme utilisant toutes les 
+// fonctionnalites ensemble. Ce dernier point est verifie par des asserts 
+// ainsi qu'un affichage console. Nous avons pris en compte 
+// toutes les allocations qui peuvent echouer comme demander 
+// lorsque nous avons poser la question sur teams
 int main() {
 	printf("Testes unitaires ...\n");
-
+	// sleep(10); // Utiliser pour avoir le temps d'attacher valgrind au process
 	test_initialiser();
 	test_insererEtSupprimerEnChangeLongeur();
 	test_estVide();
@@ -101,15 +121,15 @@ int main() {
 		afficher(l, FORWARD);
 	}
 	const int cinq = 5;
-	n = DIX + cinq;//appel a  suprimerEnTete plus de fois qu'il n'existe d'elements
+	n = DIX + cinq;	// Appel a  suprimerEnTete plus de fois qu'il n'existe d'elements
 	printf("\nsupprimer en tete %dX\n", DIX + cinq);
 	while (n--) {
 		afficher(l, FORWARD);
 		supprimerEnTete(l, &a);
 	}
-	//la liste est desormais vide
+	// La liste est desormais vide
 
-	//generation de deux element 
+	// Generation de deux element 
 	printf("\nInsertion manuel dans une liste vide et affichage a l'envers\n");
 
 	Element *e = calloc(1, sizeof(Element));
@@ -129,14 +149,14 @@ int main() {
 	e->suivant = e1;
 	e1->precedent = e;
 
-	//insert nodes
+	// Inserer noeud
 	l->queue = e1;
 	l->tete = e;
 
-	//affiche les deux noeuds
+	// Affiche les deux noeuds
 	afficher(l, BACKWARD);
-	printf("la liste est vide ? : %s\n", estVide(l) ? V : F);//faux car deux noeuds ont été insérer
-	printf("la longueur de la liste vaut : %zu\n", longueur(l));//2
+	printf("la liste est vide ? : %s\n", estVide(l) ? V : F);	// Faux car deux noeuds ont été insérer
+	printf("la longueur de la liste vaut : %zu\n", longueur(l));// 2
 	assert(longueur(l) == 2);
 	free(e);
 	free(e1);
@@ -160,11 +180,11 @@ int main() {
 	while (n--) {
 		afficher(l, FORWARD);
 		afficher(l, BACKWARD);
-		supprimerEnQueue(l, &a); //supprime les noeuds inserer
+		supprimerEnQueue(l, &a); 	// Supprime les noeuds inserer
 		printf("\nValeur supprimee: %d\n", a);
 	}
 
-	//liste est vide
+	// Liste est vide
 	printf("\n%s\n", GENERATION);
 	Info z = 1;
 	n = DIX;
@@ -180,16 +200,16 @@ int main() {
 	printf("Suppression des elements à position impaire et qui ont des valeures comprises entre %d et %d (inclus) \n",
 			 MIN, MAX);
 	supprimerSelonCritere(l, crit);
-	assert(longueur(l) == 9); //Seulement 1 element retourne true : la valeur 2
+	assert(longueur(l) == 9); // Seulement 1 element retourne true : la valeur 2
 	afficher(l, FORWARD);
 
 	printf("\nAffichage de la liste apres vidage\n");
-	supprimerSelonCritere(l, criter2);//critere2 retourn vrai pour tous les elements
+	supprimerSelonCritere(l, criter2);// Critere2 retourn vrai pour tous les elements
 	assert(longueur(l) == 0);
 	afficher(l, FORWARD);
 
 	printf("\n%s", GENERATION);
-	if (generate(l, DIX)) {
+	if (generer(l, DIX)) {
 		printf("%s", MSG);
 		NETTOIE(l);
 		exit(ERR_ALLOC);
@@ -198,7 +218,7 @@ int main() {
 	printf("\n%s", GENERATION);
 	assert(longueur(l) == DIX);
 	Liste *ll = initialiser();
-	if (generate(ll, DIX)) {
+	if (generer(ll, DIX)) {
 		printf("%s", MSG);
 		NETTOIE(l);
 		NETTOIE(ll);
@@ -232,7 +252,7 @@ int main() {
 
 
 	printf("\nRemplissage de la liste 1\n");
-	if (generate(l, DIX)) {
+	if (generer(l, DIX)) {
 		NETTOIE(l);
 
 		exit(ERR_ALLOC);
@@ -243,7 +263,7 @@ int main() {
 	printf("\nVidage incremental de la liste 1\n");
 	while (n--) {
 		afficher(l, FORWARD);
-		assert(longueur(l) == (size_t) (n + 1));//longueur est plus grand de 1 que n
+		assert(longueur(l) == (size_t) (n + 1));	// Longueur est plus grand de 1 que n
 		vider(l, (size_t) n);
 		assert(longueur(l) == (size_t) n);
 	}
@@ -259,8 +279,13 @@ int main() {
 	free(ll);
 
 	printf("Testes d'integration ...OK\n");
+	// sleep(10); // Utiliser pour avoir le temps d'attacher valgrind au process
 }
+// ------------------------------------------------------------------------------
 
+// ------------------------------------------------------------------------------
+// test_initialiser verifie que l'initialisation se passe correctement est 
+// que les champs sont bien mis a NULL
 void test_initialiser() {
 	Liste *l = initialiser();
 	if (!l) {
@@ -271,7 +296,10 @@ void test_initialiser() {
 	assert(l->queue == NULL);
 	free(l);
 }
+// ------------------------------------------------------------------------------
 
+// ------------------------------------------------------------------------------
+// test_estVide verifie que la fonction estVide fonctionne comme attendu
 void test_estVide() {
 	Liste *l = initialiser();
 	if (!l) {
@@ -291,7 +319,12 @@ void test_estVide() {
 	free(e);
 	free(l);
 }
+// ------------------------------------------------------------------------------
 
+// ------------------------------------------------------------------------------
+// test_insererEtSupprimerEnChangeLongeur verifie que les longueures 
+// changent lorsque les insertions se font correctement, il n'y a que 
+// des asserts, c'est un test unitaire.
 void test_insererEtSupprimerEnChangeLongeur() {
 	Liste *l = initialiser();
 	if (!l) {
@@ -324,7 +357,7 @@ void test_insererEtSupprimerEnChangeLongeur() {
 
 
 	size_t n = DIX;
-	if (generate(l, DIX)) {
+	if (generer(l, DIX)) {
 		NETTOIE(l);
 		exit(ERR_ALLOC);
 	}
@@ -345,7 +378,12 @@ void test_insererEtSupprimerEnChangeLongeur() {
 	vider(l, 0);
 	free(l);
 }
+// ------------------------------------------------------------------------------
 
+// ------------------------------------------------------------------------------
+// test_vider teste que le vidage de la liste se comporte comme attendu
+// vider une liste vide ne pose pas de souci, vider une liste avec une 
+// position de 0 vide la liste dans son ensemble
 void test_vider() {
 	Liste *l = initialiser();
 	if (!l) {
@@ -370,7 +408,12 @@ void test_vider() {
 	}
 	free(l);
 }
+// ------------------------------------------------------------------------------
 
+// ------------------------------------------------------------------------------
+// test_sontEgales verifie la commutativite de l'egalite. L'egalite entre 
+// deux liste vide retourne bien vrai. Des listes differentes retournent faux 
+// tandis que des listes contennant les memes informations retourn vrai
 void test_sontEgales() {
 	Liste *l = initialiser();
 	if (!l) {
@@ -384,7 +427,7 @@ void test_sontEgales() {
 		exit(ERR_ALLOC);
 	}
 	Info a = 0;
-	assert(sontEgales(l, ll)); //equal is commutative
+	assert(sontEgales(l, ll)); // Egal est commutatif
 	assert(sontEgales(ll, l));
 
 	if (insererEnTete(l, &a) != OK) {
@@ -405,28 +448,29 @@ void test_sontEgales() {
 	assert(!sontEgales(l, ll));
 	assert(!sontEgales(ll, l));
 	supprimerEnTete(ll, &a);
-	if (generate(ll, DIX)) {
+	if (generer(ll, DIX)) {
 		NETTOIE(l);
 		NETTOIE(ll);
 		exit(ERR_ALLOC);
 	}
-	if (generate(l, DIX)) {
+	if (generer(l, DIX)) {
 		NETTOIE(l);
 		NETTOIE(ll);
 		exit(ERR_ALLOC);
 	}
 	supprimerEnTete(l, &a);
-	assert(!sontEgales(l, ll));//tete est different
+	assert(!sontEgales(l, ll));// Tete est different
 	vider(l, 0);
 	vider(ll, 0);
 	free(ll);
 	ll = l;
 	assert(sontEgales(ll, l));
 	if (insererEnTete(l, &a) != OK) {
-		NETTOIE(l); //ll pointe sur l, on ne le nettoie pas sinon on a double free
+		NETTOIE(l); // ll pointe sur l, on ne le nettoie pas sinon on a double free
 		exit(ERR_ALLOC);
 	}
 	assert(sontEgales(ll, l));
 	vider(l, 0);
 	free(l);
 }
+// ------------------------------------------------------------------------------
